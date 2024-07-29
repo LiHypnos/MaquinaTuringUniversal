@@ -1,0 +1,11 @@
+{
+    "tape": "111",
+    "initialState": "q0",
+    "finalStates": ["qf"],
+    "transitionFunction": {
+      "(q0, 1)": ["q0", "1", "R"],
+      "(q0, B)": ["qf", "1", "N"]
+    }
+  }
+
+    

@@ -1,0 +1,22 @@
+{
+    "tape": "111B11",
+    "initialState": "q0",
+    "finalStates": ["qf"],
+    "transitionFunction": {
+    "(q0, 1)": ["q0", "1", "R"],
+    "(q0, B)": ["q1", "1", "R"],
+    "(q1, 1)": ["q1", "1", "R"],
+    "(q1,  )": ["qf", " ", "N"]
+    }
+}   
+Soma
+{
+    "tape": "111",
+    "initialState": "q0",
+    "finalStates": ["qf"],
+    "transitionFunction": {
+      "(q0, 1)": ["q0", "1", "R"],
+      "(q0, B)": ["qf", "1", "N"]
+    }
+  }
+Proximo
