@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BinT{
-    public String tradutorStat(String input){
-        String output = "q" + (input.length()-1);
-        return output;
+public class BinT {
+    public String tradutorStat(String input) {
+        return "q" + (input.length() - 1);
     }
-    public String tradutorSimbol(String input){
+
+    public String tradutorSimbol(String input) {
         switch (input) {
             case "111":
                 return "B";
@@ -19,10 +19,11 @@ public class BinT{
             case "1":
                 return "0";
             default:
-                return "0";
+                return "";
         }
     }
-    public String tradutorTrans(String input){
+
+    public String tradutorTrans(String input) {
         switch (input) {
             case "1":
                 return "L";
@@ -31,29 +32,27 @@ public class BinT{
             case "111":
                 return "N";
             default:
-                return "N";
+                return "";
         }
     }
-    public Map<String, List<Object>> tradutorT(String var){
-        var = var.substring(3, var.length()-3);
-        String [] transicoes = var.split("00");
+
+    public Map<String, List<Object>> tradutorT(String var) {
+        var = var.substring(3, var.length() - 3);
+        String[] transicoes = var.split("00");
         Map<String, List<Object>> transitions = new HashMap<>();
-        for (int i=0; i<transicoes.length;i++){
-            String [] aux = transicoes[i].split("0");
-            aux[0] = tradutorStat(aux[0]);
-            for(int j=1;j<4;j++){
-                aux[j] = tradutorSimbol(aux[j]);
-            }
-            aux[4] = tradutorStat(aux[4]);
-            for(int j=5;j<8;j++){
-                aux[j] = tradutorSimbol(aux[j]);
-            }
-            for(int j=8;j<11;j++){
-                aux[j] = tradutorTrans(aux[j]);
-            }
-            transitions.put("("+aux[0]+","+aux[1]+","+aux[2]+","+aux[3]+")", Arrays.asList(aux[4], aux[5]+","+aux[6]+","+
-            aux[7], Arrays.asList(aux[8]+","+aux[9]+","+aux[10])));
+
+        for (String transicao : transicoes) {
+            String[] aux = transicao.split("0");
+            String currentState = tradutorStat(aux[0]);
+            List<String> readSymbols = Arrays.asList(tradutorSimbol(aux[1]), tradutorSimbol(aux[2]), tradutorSimbol(aux[3]));
+            String nextState = tradutorStat(aux[4]);
+            List<String> writeSymbols = Arrays.asList(tradutorSimbol(aux[5]), tradutorSimbol(aux[6]), tradutorSimbol(aux[7]));
+            List<String> directions = Arrays.asList(tradutorTrans(aux[8]), tradutorTrans(aux[9]), tradutorTrans(aux[10]));
+
+            transitions.put("(" + currentState + ", " + String.join(", ", readSymbols) + ")", 
+                            Arrays.asList(nextState, writeSymbols, directions));
         }
+
         return transitions;
     }
 }
