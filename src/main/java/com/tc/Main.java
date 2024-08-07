@@ -40,6 +40,11 @@ public class Main {
             Set<String> finalStates = new HashSet<>((List<String>) input.get("finalStates"));
 
             Map<String, List<Object>> transitions = (Map<String, List<Object>>) input.get("transitionFunction");
+            for (Map.Entry<String, List<Object>> entry : transitions.entrySet()) {
+                String key = entry.getKey();
+                List<Object> values = entry.getValue();
+                System.out.println("Chave: " + key + ", Valores: " + values);
+            }
             Map<Mtx.Pair<String, List<Character>>, Mtx.Transition> transitionFunction = new HashMap<>();
             for (Map.Entry<String, List<Object>> entry : transitions.entrySet()) {
                 String[] keyParts = entry.getKey().substring(1, entry.getKey().length() - 1).split(", ");

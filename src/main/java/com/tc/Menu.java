@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,41 +21,60 @@ public class Menu {
         Scanner scanner = new Scanner(System.in);
         String escolha = scanner.nextLine();
         Gson gsonx = new Gson();
-        try (FileReader reader = new FileReader("input.json")) {
+        try (FileReader reader = new FileReader("inputbin.json")) {
 
-        /*if(escolha.equals("S") || escolha.equals("s")){ ERROR: DECODER CAST NOT WORKING   
-            Decoder dec = new Decoder();
+        if(escolha.equals("S") || escolha.equals("s")){ 
+            BinT call = new BinT();
             Type type = new TypeToken<Map<String, Object>>() {}.getType();
             Map<String, Object> input = gsonx.fromJson(reader, type);
-            
-            String tape = (String) input.get("tape");
-            String initialState = (String) input.get("initialState");
-            ArrayList<String> finalStates = (ArrayList<String>) input.get("finalStates");
-            for (int i = 0; i < finalStates.size(); i++) {
-                finalStates.set(i, dec.decState(finalStates.get(i)));
-            }
-            Set <String> newFinal = new HashSet<>(finalStates);
-            
-            ArrayList<String> transitions = new ArrayList<String>((List<String>) input.get("transitionFunction"));
-            Map<Mt.Pair<String, Character>, Mt.Transition> transitionFunction = new HashMap<>();
-            for (String entry : transitions) {
-                ArrayList<String> x = new ArrayList<>(dec.decTransicao(entry));
-                String state = x.get(0);
-                char symbol = dec.decSimbol(x.get(1)).charAt(0);
-                String newState = x.get(2);
-                char newSymbol = dec.decSimbol(x.get(3)).charAt(0);
-            
-                Mt.Direction direction = Mt.Direction.valueOf(dec.decDirecao(x.get(4)));
-            
-                transitionFunction.put(new Mt.Pair<>(state, symbol), new Mt.Transition(newState, newSymbol, direction));
-            }
-            Mt tm = new Mt(tape, 'B', dec.decState(initialState), newFinal, transitionFunction);
-            String result = tm.execute();
-            
-            System.out.println("Resultado na fita: " + result);
-            System.out.println("Histórico da fita: " + tm.tapeHistory);
 
-        } else*/ if (escolha.equals("N") || escolha.equals("n")){     
+            List<String> tapes = (List<String>) input.get("tapes");
+            String initialState = (String) input.get("initialState");
+
+            Set<String> finalStates = new HashSet<>((List<String>) input.get("finalStates"));
+            List<String> finalStatesList = new ArrayList<>(finalStates);
+            Set<String> finalStatesFinal = new HashSet<>();
+
+            initialState = call.tradutorStat(initialState);
+            for(int i=0;i<finalStatesList.size();i++){
+                finalStatesFinal.add(call.tradutorStat(finalStatesList.get(i)));
+            }
+
+            String open= (String) input.get("transitionFunction");
+            Map<String, List<Object>> transitions = (Map<String, List<Object>>) call.tradutorT(open);
+            
+            Map<Mtx.Pair<String, List<Character>>, Mtx.Transition> transitionFunction = new HashMap<>();
+            for (Map.Entry<String, List<Object>> entry : transitions.entrySet()) {
+                String[] keyParts = entry.getKey().substring(1, entry.getKey().length() - 1).split(", ");
+                String state = keyParts[0];
+                List<Character> symbols = new ArrayList<>();
+                for (String symbol : Arrays.copyOfRange(keyParts, 1, keyParts.length)) {
+                    symbols.add(symbol.charAt(0));
+                }
+
+                List<Object> valueParts = entry.getValue();
+                String newState = (String) valueParts.get(0);
+                List<Character> newSymbols = new ArrayList<>();
+                for (String newSymbol : (List<String>) valueParts.get(1)) {
+                    newSymbols.add(newSymbol.charAt(0));
+                }
+                List<Mtx.Direction> directions = new ArrayList<>();
+                for (String direction : (List<String>) valueParts.get(2)) {
+                    directions.add(Mtx.Direction.valueOf(direction));
+                }
+
+                transitionFunction.put(new Mtx.Pair<>(state, symbols), new Mtx.Transition(newState, newSymbols, directions));
+            }
+
+            Mtx tm = new Mtx(tapes, 'B', initialState, finalStatesFinal, transitionFunction);
+            String result = tm.execute();
+
+            System.out.println("Resultado nas fitas: " + result);
+            System.out.println("Histórico das fitas:");
+            for (String tapeState : tm.tapeHistory) {
+                System.out.println(tapeState);
+            }
+        } else if (escolha.equals("N") || escolha.equals("n")){     
             Type type = new TypeToken<Map<String, Object>>() {}.getType();
             Map<String, Object> input = gsonx.fromJson(reader, type);
 
