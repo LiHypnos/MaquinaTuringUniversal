@@ -36,6 +36,7 @@ public class ToBin {
 
             // Verifica se os campos são arrays JSON
             JsonArray tapesArray = jsonObject.getAsJsonArray("tapes");
+            @SuppressWarnings("unused")
             List<String> tapes = gson.fromJson(tapesArray, List.class);
 
             String initialState = jsonObject.get("initialState").getAsString();
