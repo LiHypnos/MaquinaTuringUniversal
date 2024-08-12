@@ -22,9 +22,10 @@ public class Menu {
         Scanner scanner = new Scanner(System.in);
         String escolha = scanner.nextLine();
         Gson gsonx = new Gson();
-
-        try (FileReader reader = new FileReader("inputbin.json")) {
-            if (escolha.equalsIgnoreCase("S")) { 
+        ToBin toBin = new ToBin();
+        toBin.convertToBinary("input.json", "output.json");
+        if (escolha.equalsIgnoreCase("S")) { 
+            try (FileReader reader = new FileReader("output.json")) {
                 BinT call = new BinT();
                 Type type = new TypeToken<Map<String, Object>>() {}.getType();
                 Map<String, Object> input = gsonx.fromJson(reader, type);
@@ -75,16 +76,20 @@ public class Menu {
                 for (String tapeState : tm.tapeHistory) {
                     System.out.println(tapeState);
                 }
-            } else if (escolha.equalsIgnoreCase("N")) {     
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (escolha.equalsIgnoreCase("N")) {
+            try (FileReader reader = new FileReader("novo.json")) {
                 Type type = new TypeToken<Map<String, Object>>() {}.getType();
                 Map<String, Object> input = gsonx.fromJson(reader, type);
-    
+
                 List<String> tapes = (List<String>) input.get("tapes");
                 String initialState = (String) input.get("initialState");
                 Set<String> finalStates = new HashSet<>((List<String>) input.get("finalStates"));
-    
+
                 Map<String, List<Object>> transitions = (Map<String, List<Object>>) input.get("transitionFunction");
-    
+
                 Map<Mtx.Pair<String, List<Character>>, Mtx.Transition> transitionFunction = new HashMap<>();
                 for (Map.Entry<String, List<Object>> entry : transitions.entrySet()) {
                     String[] keyParts = entry.getKey().substring(1, entry.getKey().length() - 1).split(", ");
@@ -93,7 +98,7 @@ public class Menu {
                     for (String symbol : Arrays.copyOfRange(keyParts, 1, keyParts.length)) {
                         symbols.add(symbol.charAt(0));
                     }
-    
+
                     List<Object> valueParts = entry.getValue();
                     String newState = (String) valueParts.get(0);
                     List<Character> newSymbols = new ArrayList<>();
@@ -104,23 +109,23 @@ public class Menu {
                     for (String direction : (List<String>) valueParts.get(2)) {
                         directions.add(Mtx.Direction.valueOf(direction));
                     }
-    
+
                     transitionFunction.put(new Mtx.Pair<>(state, symbols), new Mtx.Transition(newState, newSymbols, directions));
                 }
-    
+
                 Mtx tm = new Mtx(tapes, 'B', initialState, finalStates, transitionFunction);
                 String result = tm.execute();
-    
+
                 System.out.println("Resultado nas fitas: " + result);
                 System.out.println("Histórico das fitas:");
                 for (String tapeState : tm.tapeHistory) {
                     System.out.println(tapeState);
                 }
-            } else {
-                System.out.println("Escolha inválida");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            System.out.println("Escolha inválida");
         }
         scanner.close();
     }
